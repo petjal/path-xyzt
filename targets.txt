@@ -39,3 +39,5 @@ arin.net
 icann.org
 hongkongpost.gov.hk
 acme-v02.api.letsencrypt.org
+releases.grapheneos.org
+attestation.app
