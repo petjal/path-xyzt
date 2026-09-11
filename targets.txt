@@ -13,6 +13,12 @@ api.coinbase.com
 api.kraken.com
 api.binance.com
 gemini.com
+cash.app
+api.strike.me
+bitkey.world
+phoenix.acinq.co
+aquawallet.io
+cakewallet.com
 
 # Category 3: Critical Edge CDN, DNS & Cloud Hyper-Scalers
 cloudflare.com
