@@ -1,0 +1,35 @@
+# High-Value Target Endpoints for Continuous path-xyzt Telemetry
+# ----------------------------------------------------------------------
+# Category 1: Institutional Banking, Payment Rails & Financial Settlement
+www.citibank.com
+fidelity.com
+jpmorgan.com
+api.stripe.com
+frbservices.org
+dtcc.com
+
+# Category 2: Digital Asset Platforms & Exchange Gateways
+api.coinbase.com
+api.kraken.com
+api.binance.com
+gemini.com
+
+# Category 3: Critical Edge CDN, DNS & Cloud Hyper-Scalers
+cloudflare.com
+aws.amazon.com
+one.one.one.one
+dns.google
+status.cloud.google.com
+github.com
+api.fastly.com
+
+# Category 4: Regional Power Grids, Public CAs & Internet Governance
+iso-ne.com
+www.iso-ne.com
+pjm.com
+www.pjm.com
+ercot.com
+arin.net
+icann.org
+hongkongpost.gov.hk
+acme-v02.api.letsencrypt.org

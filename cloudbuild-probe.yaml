@@ -1,0 +1,8 @@
+steps:
+- name: 'gcr.io/pjgeneral-projects/path-xyzt-probe:latest'
+  env:
+  - 'PROBE_NODE_ID=vantage-gcp-build-us-central1'
+  - 'PROBE_VANTAGE_TYPE=hyperscaler_build_runner'
+  entrypoint: '/app/entrypoint.sh'
+options:
+  logging: CLOUD_LOGGING_ONLY

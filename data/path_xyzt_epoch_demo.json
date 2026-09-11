@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.5.0",
+  "protocol": "path-xyzt/v1/epoch",
+  "timestamp_iso8601": "2026-09-10T01:16:55.872325+00:00",
+  "input_stream": "/home/petjal/dev/path-xyzt/data/telemetry_stream.ndjson",
+  "records_parsed": 24,
+  "unique_bundle_seals_count": 24,
+  "bundle_seals": [
+    "0988bbeeafc6401b50c23d8631d74d5af25993daf3a173bee2cbe12fafaf0ab7",
+    "21f9ffd8099647f5fdec07d5fdca9c7a562f557215d6edf69b397acfae8777f4",
+    "2c9dbffceb843e82d5eaed5a43ed02e0d2a4b24784d253627b8a3b8da05d2bbc",
+    "40ae089c527187f13ab6eb81ad8db6b491a9daee0129bd2458f910af59d25ee1",
+    "451901e5c61c873d6c26303b360d977a1f11161aaf51f29841fad21b10325a41",
+    "45e5f78ab532941908d1690fe8def48e488311aea163dcfe65b2103770bbe697",
+    "516c33d913c8684251c2bef309e71647cafdab38ba15f6c38805a5f972569797",
+    "5c423317e96fe7b220713d71eba0b1e85d39856041ac2d4a135e9a11849b55a6",
+    "5e8e44ae1e750720a9d02936efc3d57b595726cf17bf2315ace5ac59b70bb2ff",
+    "5ed691cc0b73351de50a6e6df810c0d3813d635592a1c01d4b60aca928ebb41e",
+    "661388f5d907cc8764c5f94a3d7eed01d7e6907175b7258ed494e03e0c4402ac",
+    "66a3ea8ffe0c3941c3f9c267ebb73559ddf9125907a0373b03b6c5d39afd8beb",
+    "6c0c8fe23e01eb612a8484591771eb308564cce7005d6e7643ba79b24fd0acc9",
+    "6d5d3ccf26124cbdb5b93040463ade9e4af3be74e3b09c53a5c12e77e6cbb45f",
+    "7232d2d1d467c964212843e3663a6fd1e8cc2bac985a05a55d8078e46aea4664",
+    "856eeac8fe53de656ef2095125c622593b2248d62da309044fb36d970a8e6072",
+    "944936e750f341115c0dc22c0608cccd8d0fad8ab74621613df4246601bb5fa5",
+    "963d93dfefd83f30dbdc9f7f9379d0c1cecc497f60f35c3d0e3c957eee1b1f4c",
+    "9b765fd40110f774504fa4eb8460c5c8329f577684a24ff1628883d9108a6df9",
+    "c21c998c07d8c052b6fc0ab512be782f41b5a200ad0a5038da8ef381a8ec097c",
+    "c86c1ed47bb444ec0a4b839e05047877bd0e66e2d895cc1d1b148d07e1d0c233",
+    "dc7bac0177ec8dc60491d9061101cde7c34a36b5308f4313b668ecb12a003733",
+    "dfaf55f5e789a2672bb119ea4e5371ea6083d53a503ff2daf5ba37c793fc6f11",
+    "efaec6b99a8020959b0e272366281ea656045a1ab4b7e007db6e9fcd3ee4c90f"
+  ],
+  "rfc6962_epoch_root_sha256": "a0f9c05d44fcd8f2b2202c28af0ca110b6e826258d30fc9e83fc4817a7fe5c28",
+  "ots_submission": {
+    "lifecycle_state": "PENDING_CALENDAR",
+    "calendars": {
+      "https://alice.btc.calendar.opentimestamps.org/digest": {
+        "status": "SUBMITTED",
+        "response_bytes_len": 137
+      },
+      "https://bob.btc.calendar.opentimestamps.org/digest": {
+        "status": "SUBMITTED",
+        "response_bytes_len": 205
+      },
+      "https://finney.calendar.eternitywall.com/digest": {
+        "status": "SUBMITTED",
+        "response_bytes_len": 191
+      }
+    }
+  }
+}

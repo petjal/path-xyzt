@@ -1,0 +1,60 @@
+name: path-xyzt Cloud Telemetry Probe
+
+on:
+  schedule:
+    # Run every 3 hours (The Third Point Harmonic)
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Network Diagnostic Dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y mtr-tiny dnsutils jq
+
+      - name: Run Telemetry Batch (Cloud Vantage)
+        env:
+          PROBE_NODE_ID: "vantage-gh-actions-azure-us-east"
+          PROBE_VANTAGE_TYPE: "cloud_datacenter_backbone"
+        run: |
+          if ! ./scripts/check_deadman.sh; then
+            echo "Dead-man switch expired or not re-armed. Skipping cloud probe run."
+            exit 0
+          fi
+          mkdir -p data
+          while IFS= read -r target || [[ -n "${target}" ]]; do
+            [[ "${target}" =~ ^[[:space:]]*# ]] && continue
+            [[ -z "${target// }" ]] && continue
+            echo "Probing target: ${target}"
+            python3 scripts/strawman_collector.py "${target}" > "/tmp/probe_${target}.json" || true
+            if [ -s "/tmp/probe_${target}.json" ]; then
+              jq -c . "/tmp/probe_${target}.json" >> data/cloud_telemetry_stream.ndjson
+            fi
+            sleep 1.5
+          done < targets.txt
+
+      - name: Commit & Push Telemetry Stream
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f data/cloud_telemetry_stream.ndjson
+          if git diff --staged --quiet; then
+            echo "No new telemetry records to commit."
+          else
+            git commit -m "chore(telemetry): record 3-hour cloud vantage probe batch [skip ci]"
+            git push origin master
+          fi
