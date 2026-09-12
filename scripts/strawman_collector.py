@@ -986,9 +986,10 @@ def get_tls_telemetry(host, port=443):
 
 def probe_ssh_banner(target_ip, port=22, timeout=2.0):
     """
-    Invariant 12: Outside-In Light-Touch SSH Port 22 Banner Sentinel (RFC 4253).
+    Invariant 12: Outside-In Light-Touch SSH Port 22 Banner & Downgrade Sentinel (RFC 4253).
     Connects to TCP port 22 with non-blocking timeout, captures server identification string,
-    and cleanly closes connection without attempting authentication or sending credentials.
+    evaluates passive downgrade weakness indicators, and cleanly closes connection without
+    attempting authentication or sending credentials.
     """
     info = {
         "port_22_open": False,
@@ -996,6 +997,11 @@ def probe_ssh_banner(target_ip, port=22, timeout=2.0):
         "protocol_version": None,
         "software_version": None,
         "comments": None,
+        "downgrade_telemetry": {
+            "allows_ssh_v1_downgrade": False,
+            "obsolete_protocol_1_0": False,
+            "downgrade_risk_flags": []
+        },
         "rtt_ms": None,
         "error": None
     }
@@ -1017,12 +1023,31 @@ def probe_ssh_banner(target_ip, port=22, timeout=2.0):
         if clean.startswith("SSH-"):
             parts = clean.split("-", 2)
             if len(parts) >= 2:
-                info["protocol_version"] = parts[1]
+                proto_ver = parts[1]
+                info["protocol_version"] = proto_ver
+                # Passive Downgrade Signal: RFC 4253 Section 5.1
+                # Servers advertising "SSH-1.99-" permit client fallback to broken SSH-1.x protocols
+                if proto_ver == "1.99":
+                    info["downgrade_telemetry"]["allows_ssh_v1_downgrade"] = True
+                    info["downgrade_telemetry"]["downgrade_risk_flags"].append("PROTOCOL_1_99_BACKWARD_COMPAT_DOWNGRADE_RISK")
+                elif proto_ver.startswith("1."):
+                    info["downgrade_telemetry"]["obsolete_protocol_1_0"] = True
+                    info["downgrade_telemetry"]["downgrade_risk_flags"].append("PROTOCOL_1_0_OBSOLETE_ACTIVE")
+
             if len(parts) >= 3:
                 sw_and_comments = parts[2].split(" ", 1)
                 info["software_version"] = sw_and_comments[0]
                 if len(sw_and_comments) > 1:
                     info["comments"] = sw_and_comments[1]
+                
+                # Check for historical vulnerable release windows from unmasked banner
+                sw = sw_and_comments[0]
+                if sw.startswith("OpenSSH_"):
+                    m = re.match(r"OpenSSH_([0-9]+)\.([0-9]+)(?:p([0-9]+))?", sw)
+                    if m:
+                        maj, mino = int(m.group(1)), int(m.group(2))
+                        if maj < 9 or (maj == 9 and mino < 8):
+                            info["downgrade_telemetry"]["downgrade_risk_flags"].append("UNPATCHED_HISTORICAL_REGRESSION_WINDOW")
     except socket.timeout:
         info["error"] = "TIMEOUT"
     except ConnectionRefusedError:
