@@ -983,6 +983,60 @@ def get_tls_telemetry(host, port=443):
         }
 
 
+
+def probe_ssh_banner(target_ip, port=22, timeout=2.0):
+    """
+    Invariant 12: Outside-In Light-Touch SSH Port 22 Banner Sentinel (RFC 4253).
+    Connects to TCP port 22 with non-blocking timeout, captures server identification string,
+    and cleanly closes connection without attempting authentication or sending credentials.
+    """
+    info = {
+        "port_22_open": False,
+        "raw_banner": None,
+        "protocol_version": None,
+        "software_version": None,
+        "comments": None,
+        "rtt_ms": None,
+        "error": None
+    }
+    t0 = time.perf_counter()
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(timeout)
+    try:
+        s.connect((target_ip, port))
+        info["port_22_open"] = True
+        raw_data = b""
+        while b"\n" not in raw_data and len(raw_data) < 512:
+            chunk = s.recv(256)
+            if not chunk:
+                break
+            raw_data += chunk
+        info["rtt_ms"] = round((time.perf_counter() - t0) * 1000, 2)
+        clean = raw_data.decode("utf-8", errors="replace").strip()
+        info["raw_banner"] = clean if clean else None
+        if clean.startswith("SSH-"):
+            parts = clean.split("-", 2)
+            if len(parts) >= 2:
+                info["protocol_version"] = parts[1]
+            if len(parts) >= 3:
+                sw_and_comments = parts[2].split(" ", 1)
+                info["software_version"] = sw_and_comments[0]
+                if len(sw_and_comments) > 1:
+                    info["comments"] = sw_and_comments[1]
+    except socket.timeout:
+        info["error"] = "TIMEOUT"
+    except ConnectionRefusedError:
+        info["error"] = "REFUSED"
+    except Exception as e:
+        info["error"] = str(e)
+    finally:
+        try:
+            s.shutdown(socket.SHUT_RDWR)
+        except Exception:
+            pass
+        s.close()
+    return info
+
 def collect_target_bundle(target_host):
     t_dns_start = time.perf_counter()
     addr_info = socket.getaddrinfo(target_host, 443, socket.AF_INET, socket.SOCK_STREAM)
@@ -1011,6 +1065,7 @@ def collect_target_bundle(target_host):
     admin_contacts = get_administrative_contacts(target_host)
     counterpart_audit = audit_counterpart(target_host, target_ip, target_asn)
     surface_audit = audit_surface_and_canary(target_host)
+    ssh_audit = probe_ssh_banner(target_ip, port=22, timeout=1.5)
 
     # 6. Merkle Seals (Binary Length-Prefixed 256-Bit)
     # A. H_ROUTING
@@ -1172,7 +1227,8 @@ def collect_target_bundle(target_host):
                 "redirect_location": admin_contacts.get("p80_redirect_location"),
                 "is_permanent_redirect": admin_contacts.get("p80_is_permanent", False)
             },
-            "defensive_headers": admin_contacts.get("defensive_headers", {})
+            "defensive_headers": admin_contacts.get("defensive_headers", {}),
+            "ssh_banner_port22": ssh_audit
         },
         "latency_breakdown_ms": {
             "dns_resolution_ms": t_dns_ms,

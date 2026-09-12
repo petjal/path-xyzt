@@ -94,6 +94,15 @@ To prove historical state integrity without central notary reliance:
 
 ---
 
+
+### Invariant 13: Passive Telemetry Stand-Off & Zero-Exploitation Perimeter Guard
+`path-xyzt` is strictly an outside-in, zero-privilege, empirical telemetry recorder—**NEVER a vulnerability scanner, fuzzer, or intrusive penetration tool**.
+
+To maintain rigorous safe-harbor protections, prevent defensive WAF/fail2ban bans, and uphold ethical telemetry integrity, all transport probing adheres strictly to the following stand-off bounds:
+1. **Zero Exploitation & Zero Fuzzing**: Under no circumstances does `path-xyzt` inject malformed payloads, fuzzing buffers, shellcode, exploit sequences, path traversal strings, or non-standard control sequences.
+2. **Zero Ingestion of Auth Endpoints**: For SSH (port 22), the probe connects solely to read the server's unsolicited RFC 4253 protocol identification string (`SSH-protoversion-softwareversion`). The probe NEVER sends client identification, NEVER attempts key exchange, NEVER submits usernames/passwords, and NEVER requests an authentication method. Upon receiving the initial banner (or at 1.5s timeout), the TCP socket is immediately terminated with `shutdown(SHUT_RDWR)` and `close()`.
+3. **Pure Passive Observation**: The probe records solely what the public server voluntarily announces to the open network prior to any interactive session. Findings are recorded as factual telemetry observations (e.g. `raw_banner: "SSH-2.0-OpenSSH_9.6p1"`), never speculative vulnerability verdicts.
+
 ## 3. Systems, Execution & Timeout Budgets
 
 ### Invariant 4: Generous 45.0s Envelope & The "Non-Responsive Target" Invariant

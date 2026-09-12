@@ -41,3 +41,13 @@ hongkongpost.gov.hk
 acme-v02.api.letsencrypt.org
 releases.grapheneos.org
 attestation.app
+
+# Category 5: Critical Infrastructure & Sovereign Government Backbones (CISA / Homeland Security)
+cisa.gov
+energy.gov
+sec.gov
+treasury.gov
+swift.com
+nyse.com
+epri.com
+nasdaq.com
