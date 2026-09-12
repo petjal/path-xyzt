@@ -641,6 +641,20 @@ def audit_surface_and_canary(target_host):
         except Exception:
             pass
 
+    # Audit discovered warrant canary page if content not yet fetched
+    if result["warrant_canary"]["present"] and result["warrant_canary"]["url"] and not result["warrant_canary"].get("status"):
+        can_url = result["warrant_canary"]["url"]
+        try:
+            req_c = urllib.request.Request(can_url, headers={'User-Agent': CANONICAL_USER_AGENT})
+            with urllib.request.urlopen(req_c, timeout=3, context=ctx) as r_c:
+                result["warrant_canary"]["status"] = r_c.status
+                c_body = r_c.read(65536).decode('utf-8', errors='ignore')
+                result["warrant_canary"]["is_pgp_clearsigned"] = ("-----BEGIN PGP SIGNED MESSAGE-----" in c_body)
+                c_norm = " ".join(re.sub(r"<[^>]+>", " ", c_body).split())
+                result["warrant_canary"]["h_canary_prose"] = hashlib.sha256(c_norm.encode('utf-8')).hexdigest()
+        except Exception as e:
+            result["warrant_canary"]["status"] = f"ERR: {e}"
+
     # Audit discovered security page
     if result["homepage_security_link"]["present"] and result["homepage_security_link"]["url"]:
         sec_url = result["homepage_security_link"]["url"]

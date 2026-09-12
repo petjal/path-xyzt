@@ -51,3 +51,7 @@ swift.com
 nyse.com
 epri.com
 nasdaq.com
+
+# Category 6: Sovereign Storage & Warrant Canary Sentinels
+rsync.net
+riseup.net
